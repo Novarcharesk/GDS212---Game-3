@@ -1,20 +1,27 @@
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance; // Singleton instance for easy access
+    public static GameManager Instance;
 
-    public GameObject gameOverUI; // Reference to the game over UI panel or canvas
-    public PlayerHealth playerHealth; // Reference to the PlayerHealth script
+    public GameObject gameOverUI;
+    public PlayerHealth playerHealth;
+    public int pickupsToWin = 10;
+    public TextMeshProUGUI scoreText;
+
+    public Text messageText;
+    public float messageDisplayDuration = 5.0f;
 
     private bool isGameOver = false;
+    private int pickupsCollected = 0;
+
+    public int score = 0;
 
     private void Awake()
     {
-        // Ensure there's only one instance of the GameManager
         if (Instance == null)
         {
             Instance = this;
@@ -25,12 +32,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // Display the initial message
+        DisplayMessage();
+
+        // Other initialization logic...
+    }
+
+    private void DisplayMessage()
+    {
+        if (messageText != null)
+        {
+            messageText.enabled = true;
+            StartCoroutine(HideMessage());
+        }
+    }
+
+    private IEnumerator HideMessage()
+    {
+        yield return new WaitForSeconds(messageDisplayDuration);
+
+        if (messageText != null)
+        {
+            messageText.enabled = false;
+        }
+    }
+
     private void Update()
     {
-        // Check for game over conditions here if needed
-        if (playerHealth != null && playerHealth.currentHealth <= 0)
+        if (playerHealth != null && playerHealth.currentHealth <= 0 && !isGameOver)
         {
             GameOver();
+        }
+
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score;
         }
     }
 
@@ -39,9 +77,6 @@ public class GameManager : MonoBehaviour
         if (!isGameOver)
         {
             isGameOver = true;
-
-            // Perform game over actions here
-            // For example, activate the game over UI and show a message
             if (gameOverUI != null)
             {
                 gameOverUI.SetActive(true);
@@ -49,11 +84,32 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ... Other methods ...
-
     public void RestartGame()
     {
-        // Reload the current scene to restart the game
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    public void CollectPickup(GameObject pickup)
+    {
+        if (pickup != null)
+        {
+            score += 10;
+            pickupsCollected++;
+
+            if (pickupsCollected >= pickupsToWin)
+            {
+                GameWin();
+            }
+
+            Destroy(pickup);
+
+            // Spawn a new pickup at a random spawn point (you can implement this).
+        }
+    }
+
+    public void GameWin()
+    {
+        Debug.Log("You won the game!");
+        // Add any additional logic for winning the game.
     }
 }
