@@ -1,18 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // Import TMPro namespace for TextMeshPro
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 100; // Adjust the maximum health as needed
-    public int currentHealth;
+    public int maxHealth = 10; // Maximum health
+    public int currentHealth; // Current health
     public float invincibilityDuration = 3.0f; // Duration of invincibility after getting hit
     private float invincibilityTimer = 0.0f;   // Timer to track invincibility time
-    private bool isInvincible = false;         // Flag to determine if the whale is invincible
+    private bool isInvincible = false;         // Flag to determine if the player is invincible
+    public TextMeshProUGUI healthText; // Reference to the TextMeshProUGUI element for health display
+    public GameObject gameOverUI; // Reference to the game over UI panel or canvas
 
     private void Start()
     {
-        currentHealth = maxHealth; // Initialize current health to the maximum value
+        currentHealth = maxHealth; // Initialize current health
+        UpdateHealthText();
     }
 
     private void Update()
@@ -39,37 +43,36 @@ public class PlayerHealth : MonoBehaviour
         {
             // Reduce the current health by the damage amount
             currentHealth -= damageAmount;
+            UpdateHealthText();
 
-            // Check if the player's health has dropped to or below zero
             if (currentHealth <= 0)
             {
-                // Player has died (you can implement game over logic here)
+                // Player has run out of health
                 Die();
             }
 
             // Start invincibility
             isInvincible = true;
             invincibilityTimer = 0.0f;
-
-            // Optionally, you can add other effects here, such as visual feedback for invincibility
         }
     }
 
-    // Method to handle player's death (you can customize this)
+    // Method to handle player's death
     private void Die()
     {
-        // For example, you can deactivate the player object or trigger a game over screen
-        gameObject.SetActive(false); // Deactivate the player (whale) GameObject
+        // Deactivate the player object or trigger a game over screen
+        gameObject.SetActive(false); // Deactivate the player GameObject
         GameManager.Instance.GameOver();
+
+        // Optionally, you can add other game over effects here.
     }
 
-    // Method to heal the player (you can customize this)
-    public void Heal(int healAmount)
+    // Update the health display
+    private void UpdateHealthText()
     {
-        // Increase the current health by the heal amount
-        currentHealth += healAmount;
-
-        // Ensure that the current health does not exceed the maximum
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        if (healthText != null)
+        {
+            healthText.text = "Health: " + currentHealth.ToString();
+        }
     }
 }

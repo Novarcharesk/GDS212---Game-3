@@ -20,9 +20,16 @@ public class PlayerController : MonoBehaviour
         float verticalInput = joystick.Vertical;
 
         // Calculate the movement vector
-        Vector2 moveDirection = new Vector2(horizontalInput, verticalInput);
+        Vector2 moveDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
         // Apply movement to the whale
-        rb.velocity = moveDirection.normalized * swimSpeed;
+        rb.velocity = new Vector3(moveDirection.x, moveDirection.y, 0) * swimSpeed;
+
+        // Rotate the whale to face its movement direction
+        if (moveDirection != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
     }
 }
