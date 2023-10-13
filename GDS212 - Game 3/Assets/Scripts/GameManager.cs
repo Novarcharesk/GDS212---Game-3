@@ -12,7 +12,8 @@ public class GameManager : MonoBehaviour
     public int pickupsToWin = 10;
     public TextMeshProUGUI scoreText;
 
-    public Text messageText;
+    public TextMeshProUGUI messageText;
+    public GameObject winUI;
     public float messageDisplayDuration = 5.0f;
 
     private bool isGameOver = false;
@@ -93,10 +94,11 @@ public class GameManager : MonoBehaviour
     {
         if (pickup != null)
         {
-            score += 10;
+            score += 1;
+            scoreText.text = "Score: " + score;
             pickupsCollected++;
 
-            if (pickupsCollected >= pickupsToWin)
+            if (score >= pickupsToWin)
             {
                 GameWin();
             }
@@ -111,5 +113,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("You won the game!");
         // Add any additional logic for winning the game.
+
+        winUI.SetActive(true);
     }
 }
